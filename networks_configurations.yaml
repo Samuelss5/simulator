@@ -1,0 +1,192 @@
+
+common_parameters:
+
+  shadowing_variance_LOS: 4.2
+  shadowing_variance_NLOS: 7
+
+  frequency: 7.5e9 
+
+
+
+Fixed_service:
+
+  ### COORDINATES / POSITIONING ###
+
+  terminal_deployment_module_path: 'source/geometry/coordinates.py'
+  terminal_deployment_method_class: 'RegularGridDeployment'
+
+  station_deployment_module_path: 'source/geometry/coordinates.py'
+  station_deployment_method_class: 'RegularGridDeployment'
+
+  ### SPATIAL CORRELATION ###
+
+  correlation_model_module_path: 'source/physical/spatial_correlation.py'
+  correlation_model_method_class: 'Gaussian_correlation'
+
+  ### LARGE SCALE FADING ###
+
+  lsf_model_module_path: 'source/physical/large_scale_fading.py'
+  lsf_model_method_class: 'UMa_3gpp_large_scale_fading'
+
+  ### CHANNEL MODEL ###
+
+  channel_model_module_path: 'source/physical/channel.py'
+  channel_model_method_class: 'RicianChannel'
+
+  ### CHANNEL ESTIMATION METHOD ###
+
+  channel_estimation_module_path: 'source/channel_estimation.py'
+  channel_estimation_method_class: 'Centralized_MMSE_estimation'
+
+  ### RADIATION PATTERNS ###
+
+  terminal_antenna_gain_module_path: 'source/physical/antenna_pattern.py'
+  terminal_antenna_gain_method_class: 'itu_fs_pattern'
+
+  station_antenna_gain_module_path: 'source/physical/antenna_pattern.py'
+  station_antenna_gain_method_class: 'itu_fs_pattern'
+
+  ### SECTORIZATION TECHNIQUE ###
+
+  terminal_sectorization_module_path: 'source/geometry/sectorization.py'
+  terminal_sectorization_method_class: 'UniformSectorization'
+
+  station_sectorization_module_path: 'source/geometry/sectorization.py'
+  station_sectorization_method_class: 'UniformSectorization'
+
+
+  num_terminals: 1
+  num_stations: 1
+
+  N_h_terminals: 1
+  N_v_terminals: 1
+
+  N_h_stations: 1
+  N_v_stations: 1
+
+  num_arrays_per_terminal: 1
+  num_arrays_per_station: 1
+
+  terminal_downtilt: 0.0
+  station_downtilt: 0.0
+
+  terminals_max_power: 0.1
+  stations_max_power: 1
+
+  terminals_height: 50.0
+  stations_height: 50.0
+
+  num_pilot_sequences: 1
+
+  noise_figure: 5.0 # dB
+  noise_density: -174.0 # dBm / Hz
+
+  bandwidth: 200.0e+6
+
+  carrier_frequency: 7.75e+9 
+  
+  inter_sight_distance: 350
+
+
+
+Dmimo_network:
+
+  inter_sight_distance: 350
+
+  terminal_deployment_module_path: 'source/geometry/coordinates.py'
+  terminal_deployment_method_class: 'UMa3gppTerminalsDeployment'
+
+  station_deployment_module_path: 'source/geometry/coordinates.py'
+  station_deployment_method_class: 'RegularGridDeployment'
+
+  correlation_model_module_path: 'source/physical/spatial_correlation.py'
+  correlation_model_method_class: 'GaussianCorrelation'
+
+  lsf_model_module_path: 'source/physical/large_scale_fading.py'
+  lsf_model_method_class: 'UMa_3gpp_large_scale_fading'
+
+  channel_model_module_path: 'source/physical/channel.py'
+  channel_model_method_class: 'RicianChannel'
+
+  channel_estimation_module_path: 'source/channel_estimation.py'
+  channel_estimation_method_class: 'Centralized_MMSE_estimation'
+
+  terminal_antenna_gain_module_path: 'source/physical/antenna_pattern.py'
+  terminal_antenna_gain_method_class: 'Terminals_3gpp_pattern'
+
+  station_antenna_gain_module_path: 'source/physical/antenna_pattern.py'
+  station_antenna_gain_method_class: 'Stations_3gpp_pattern'
+
+
+  ### Combining and Beamforming ###
+
+  terminals_combining_module_path: 'source/beamforming.py'
+  terminals_combining_method_class: 'NoCombining'
+
+  terminals_beamforming_module_path: 'source/beamforming.py'
+  terminals_beamforming_method_class: 'NoBeamforming'
+
+
+  stations_combining_module_path: 'source/beamforming.py'
+  stations_combining_method_class: 'DMimoCentralizedMmseCombining'
+
+  stations_beamforming_module_path: 'source/beamforming.py'
+  stations_beamforming_method_class: 'DMimoCentralizedMmseBeamforming'
+
+
+  terminal_panel_selection_module_path: 'source/panel_selection.py'
+  terminal_panel_selection_method_class: 'TerminalPanelSelectionAltruistic'
+
+  ### === CLUSTERING === ###
+
+  stations_clustering_module_path: 'source/clustering.py'
+  stations_clustering_method_class: 'NoClustering'
+
+
+  terminal_sectorization_module_path: 'source/geometry/sectorization.py'
+  terminal_sectorization_method_class: 'UserEquipmentSectorization'
+
+  station_sectorization_module_path: 'source/geometry/sectorization.py'
+  station_sectorization_method_class: 'UniformSectorization'
+
+  terminal_scheduling_module_path: 'source/scheduling.py'
+  terminal_scheduling_method_class: 'IndividualEstimated_INR'
+
+
+  num_terminals: 15
+  num_stations: 16
+
+  num_panels: 4
+  num_arrays: 3
+
+  N_h_terminals: 1
+  N_v_terminals: 1
+
+  panel_N_h: 1
+  panel_N_v: 1
+
+  array_N_h: 4
+  array_N_v: 2
+
+  terminals_max_power: 0.1
+  stations_max_power: 0.1
+
+  terminals_height: 1.5
+  stations_height: 18.0
+
+  terminal_downtilt: 0.0
+  station_downtilt: 6.0
+
+  noise_figure: 5.0 # dB
+  noise_density: -174.0 # dBm / Hz
+
+  bandwidth: 200.0e+6
+
+  carrier_frequency: 7.75e+9
+
+  num_pilot_sequences: 10
+
+
+num_snapshots: 200
+
+
