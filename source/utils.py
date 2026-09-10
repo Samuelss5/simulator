@@ -11,7 +11,7 @@ def db2lin(x):
     return pow(10,x/10)
 
 
-def lin2dB(x):
+def lin2db(x):
     """
     Converts a value from linear scale to decibels (dB).
     

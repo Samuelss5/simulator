@@ -183,6 +183,7 @@ class ScenarioReader:
 
         # When the SN is in uplink -> UEs scheduling
 
+        # 1. 
         selected_panels = self._scheduling.select_terminal_panels(
             inter_network_gains = self.cross_channels.pn_term_sn_term_lsg[ite],
             intra_network_gains = self.sn_geometry.H_coeffs[ite],
@@ -198,13 +199,44 @@ class ScenarioReader:
             pn_noise_variance  = self.pn_config.noise_variance
         )
 
+
+        from source.utils import lin2db, db2lin
+
+        # Mean of the Ricean factor in linear scale
+        K_mu_linear = db2lin(self.sn_config.methods["lsf_model"].K_mu)
+
+        # print("Fatores K")
+        # print(self.cross_channels.pn_term_sn_term_K[ite][0])
+
+        strong_los_ues = np.where(self.cross_channels.pn_term_sn_term_K[ite][0] > 0.0)[0]
+        weak_los_ues = np.where(self.cross_channels.pn_term_sn_term_K[ite][0] == 0)[0]
+       
+        # print("Weak LOS UEs")
+        # print(weak_los_ues)
+
+        # print("Strong LOS UEs")
+        # print(strong_los_ues)
+
+        # UEs that were scheduled in the shared band and have strong LOS towards the FS
+        scheduled_strong_los_ues = np.intersect1d(strong_los_ues, scheduled_terminals)
+
+        # UEs that were scheduled in the shared band and have weak LOS towards the FS
+        scheduled_weak_los_ues = np.intersect1d(weak_los_ues, scheduled_terminals)
+
+        # print("Scheduled UEs")
+        # print(scheduled_terminals)
+
+        # print("Weak LOS UEs: ")
+        # print(scheduled_weak_los_ues)
+
+
+        # SN performing channel estimation considering all UEs
         H_est, C_error = self.sn_config.methods["channel_estimation"].compute(
             self.sn_geometry.H_coeffs[ite], self.sn_geometry.R_matrices[ite], selected_panels, scheduled_terminals,
             self.sn_config.num_pilot_sequences, self.sn_config.terminal_max_power, self.sn_config.noise_variance
         )
 
         # All APs serve all UEs
-
         L = self.sn_config.num_stations * self.sn_config.num_arrays
         clustering_matrix = np.ones((self.sn_config.num_terminals, L))
 
@@ -214,13 +246,41 @@ class ScenarioReader:
 
         pn_combining = np.ones((self.pn_config.num_terminals, 1))
 
-        sn_ul_spec_effs, sn_ul_caused_inr = self._kpi_calculator.compute_uplink_kpis(
+
+        # Computing the INR caused by the strong LOS UEs
+        sn_ul_caused_inr_by_strong_los_ues = self._kpi_calculator.compute_sn_uplink_caused_inr(
+            self.cross_channels.pn_term_sn_term_H[ite], scheduled_strong_los_ues, selected_panels,  pn_combining, 
+            self.sn_config.terminal_max_power
+        )
+
+        # Computing the INR caused by the weak LOS UEs
+        sn_ul_caused_inr_by_weak_los_ues = self._kpi_calculator.compute_sn_uplink_caused_inr(
+            self.cross_channels.pn_term_sn_term_H[ite], scheduled_weak_los_ues, selected_panels,  pn_combining, 
+            self.sn_config.terminal_max_power
+        )
+
+        sn_ul_spec_effs, sn_ul_caused_inr_by_all_ues = self._kpi_calculator.compute_uplink_kpis(
             self.sn_geometry.H_coeffs[ite], self.cross_channels.pn_term_sn_term_H[ite], self.cross_channels.pn_stat_sn_stat_H[ite],
             clustering_matrix, scheduled_terminals, selected_panels, sn_combiners, pn_combining, 
             self.sn_config.terminal_max_power, self.pn_config.station_max_power, self.rng
                     )
 
-        return 10*np.log10(sn_ul_caused_inr[0]), len(scheduled_terminals), np.sum(sn_ul_spec_effs)
+
+        sn_ul_caused_inr_by_strong_los_ues = lin2db(sn_ul_caused_inr_by_strong_los_ues[0])
+        sn_ul_caused_inr_by_weak_los_ues   = lin2db(sn_ul_caused_inr_by_weak_los_ues[0])
+        sn_ul_caused_inr_by_all_ues        = lin2db(sn_ul_caused_inr_by_all_ues[0])
+
+
+
+
+        return (
+            sn_ul_caused_inr_by_strong_los_ues, 
+            sn_ul_caused_inr_by_weak_los_ues,
+            sn_ul_caused_inr_by_weak_los_ues, 
+            len(scheduled_terminals), 
+            np.sum(sn_ul_spec_effs) 
+
+            )
 
     def compute_downlink_kpis(self, ite: int):
 

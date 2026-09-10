@@ -86,7 +86,8 @@ def main():
 
     
     
-    
+    uplink_strong_LOS_INR_results = {}
+    uplink_weak_LOS_INR_results = {}
     uplink_INR_results = {}
     uplink_num_UEs_results = {}
     uplink_SE_results = {}
@@ -97,6 +98,8 @@ def main():
 
                 key = panel_tech + ' + ' + sched_tech + ' + ' + str(sched_thresh)
 
+                uplink_strong_LOS_INR_results[key] = []
+                uplink_weak_LOS_INR_results[key] = []
                 uplink_INR_results[key] = []
                 uplink_num_UEs_results[key] = []
                 uplink_SE_results[key] = []
@@ -122,7 +125,10 @@ def main():
 
                     print(key)
 
-                    ul_caused_inr, ul_num_UEs, ul_sum_se = sce_reader.compute_uplink_kpis(ite)
+                    ul_caused_inr_strong, ul_caused_inr_weak, ul_caused_inr, ul_num_UEs, ul_sum_se = sce_reader.compute_uplink_kpis(ite)
+
+                    uplink_strong_LOS_INR_results[key].append(ul_caused_inr_strong)
+                    uplink_weak_LOS_INR_results[key].append(ul_caused_inr_weak)
 
                     uplink_INR_results[key].append(ul_caused_inr)
                     uplink_num_UEs_results[key].append(ul_num_UEs)
@@ -132,6 +138,9 @@ def main():
 
     import pandas as pd
 
+    ul_inr_strong_df = pd.DataFrame(uplink_strong_LOS_INR_results)
+    ul_inr_weak_df  = pd.DataFrame(uplink_weak_LOS_INR_results)
+
     ul_inr_df = pd.DataFrame(uplink_INR_results)
     ul_num_UEs_df = pd.DataFrame(uplink_num_UEs_results)
     ul_se_df = pd.DataFrame(uplink_SE_results)
@@ -140,7 +149,11 @@ def main():
     path_num = 'results_storage/num_ues_results/'
     path_se = 'results_storage/se_results/'
 
+    ul_inr_strong_df.to_csv(path_inr + 'ul_inr_strong.csv', index=False, sep=',', encoding='utf-8')
+    ul_inr_weak_df.to_csv(path_inr + 'ul_inr_weak.csv', index=False, sep=',', encoding='utf-8')
+
     ul_inr_df.to_csv(path_inr + 'ul_inr.csv', index=False, sep=',', encoding='utf-8')
+
     ul_num_UEs_df.to_csv(path_num + 'ul_num_UEs.csv', index=False, sep=',', encoding='utf-8')
     ul_se_df.to_csv(path_se + 'ul_sum_se.csv', index=False, sep=',', encoding='utf-8')
         
